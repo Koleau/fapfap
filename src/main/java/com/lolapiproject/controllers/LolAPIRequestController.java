@@ -1,8 +1,9 @@
 package com.lolapiproject.controllers;
 
-import com.lolapiproject.Const;
+import com.lolapiproject.bean.Summoner;
 import com.lolapiproject.service.LolAPIService;
 import com.lolapiproject.utils.RetrofitUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,33 +14,27 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.util.Map;
 
-/**
- * Created by Pflieger on 21/04/2016.
- */
 
 @Controller
 @RequestMapping("/lolapi")
 public class LolAPIRequestController {
 
+    @Value("${apikey}")
+    private String apiKey;
+
     @RequestMapping(method = RequestMethod.POST)
     ResponseEntity<?> requestLolAPI() {
-
         HttpHeaders httpHeaders = new HttpHeaders();
-
-
-
         LolAPIService lolAPIService = RetrofitUtils.buildLolAPIService();
-
-        Call<Object> call = lolAPIService.getSummonerByName("jouaoutch", Const.API_KEY);
-
-        Response<Object> response = null;
+        Call<Map<String, Summoner>> call = lolAPIService.getSummonerByName("koslo", apiKey);
+        Response<Map<String, Summoner>> response = null;
         try {
             response = call.execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return new ResponseEntity<>(response.body(), httpHeaders, HttpStatus.OK);
     }
 

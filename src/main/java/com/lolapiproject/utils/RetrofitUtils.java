@@ -4,9 +4,6 @@ import com.lolapiproject.service.LolAPIService;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
-/**
- * Created by Pflieger on 22/04/2016.
- */
 public class RetrofitUtils {
 
     public static LolAPIService buildLolAPIService() {

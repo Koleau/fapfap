@@ -1,8 +1,10 @@
 package com.lolapiproject.controllers;
 
-import com.lolapiproject.bean.Summoner;
-import com.lolapiproject.service.LolAPIService;
+import com.lolapiproject.bean.Champion;
+import com.lolapiproject.repository.RuneRepository;
+import com.lolapiproject.service.LolAPIGlobalService;
 import com.lolapiproject.utils.RetrofitUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,9 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,18 +29,28 @@ public class LolAPIRequestController {
     @Value("${apikey}")
     private String apiKey;
 
+    @Autowired
+    private RuneRepository runeRepository;
+
     @RequestMapping(method = RequestMethod.POST)
     ResponseEntity<?> requestLolAPI() {
         HttpHeaders httpHeaders = new HttpHeaders();
-        LolAPIService lolAPIService = RetrofitUtils.buildLolAPIService();
-        Call<Map<String, Summoner>> call = lolAPIService.getSummonerByName("koslo", apiKey);
-        Response<Map<String, Summoner>> response = null;
+        LolAPIGlobalService lolAPIGlobalService = RetrofitUtils.buildLolAPIServiceGlobal();
+        Call<Map<String, Object>> call2 = lolAPIGlobalService.getChampionList(apiKey);
+        Response<Map<String, Object>> response2 = null;
         try {
-            response = call.execute();
+            response2 = call2.execute();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ResponseEntity<>(response.body(), httpHeaders, HttpStatus.OK);
+        Map heroMap = (Map) response2.body().get("data");
+        List<Champion> champions = new ArrayList<>();
+        for (Object o : heroMap.values()) {
+            champions.add(Champion.linkedHashMapToChampion((LinkedHashMap) o));
+        }
+        return new ResponseEntity<>(null, httpHeaders, HttpStatus.OK);
     }
+
+
 
 }
